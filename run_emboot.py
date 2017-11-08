@@ -28,6 +28,7 @@ from fuel.schemes import ShuffledScheme, SequentialScheme
 from fuel.streams import DataStream
 from fuel.transformers import Transformer
 
+# from fuel_converter_new import EMBOOT_NEW
 from fuel_converter import EMBOOT
 
 from picklable_itertools import cycle, imap
@@ -236,6 +237,7 @@ def setup_data(p, test_set=False):
         'cifar10': (CIFAR10, 40000),
         'mnist': (MNIST, 50000),
         'emboot': (EMBOOT, 13000)
+        # 'emboot': (EMBOOT_NEW, 13000)
     }[p.dataset]
 
     # Allow overriding the default from command line
@@ -310,7 +312,10 @@ def get_error(args):
     targets, acts = analyze(args)
     guess = numpy.argmax(acts, axis=1)
     correct = numpy.sum(numpy.equal(guess, targets.flatten()))
-
+    print("Acts sz : " + str(acts.shape))
+    print("Targets sz : " + str(targets.shape))
+    print ("Guess " + str(guess.shape))
+    print ("Targets " + str(targets.flatten().shape))
     return (1. - correct / float(len(guess))) * 100.
 
 
@@ -318,13 +323,16 @@ def analyze(cli_params):
     p, _ = load_and_log_params(cli_params)
     _, data, whiten, cnorm = setup_data(p, test_set=True)
     ladder = setup_model(p)
-
+    p.data_type = 'train' ### RUN the evaluation on the TRAIN dataset ... 
     # Analyze activations
     dset, indices, calc_batchnorm = {
-        'train': (data.train, data.train_ind, False),
+        'train': (data.train, data.train_ind, True), ## Changing from False
         'valid': (data.valid, data.valid_ind, True),
         'test':  (data.test, data.test_ind, True),
     }[p.data_type]
+
+    print("data.train_ind " + str(data.train_ind))
+    print("data.train_ind " + str(data.train_ind.shape))
 
     if calc_batchnorm:
         logger.info('Calculating batch normalization for clean.labeled path')
@@ -396,6 +404,9 @@ def analyze(cli_params):
 
     # Concatenate all minibatches
     res = [numpy.vstack(minibatches) for minibatches in zip(*res)]
+    # print("res = " + str(res))
+    # print("res.shape = " + str(res[0].shape))
+    # print("inputs = " + str(inputs))
     inputs = {k: numpy.vstack(v) for k, v in inputs.iteritems()}
 
     return inputs['targets_labeled'], res[0]
