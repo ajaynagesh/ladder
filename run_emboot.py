@@ -313,9 +313,12 @@ def get_error(args):
     guess = numpy.argmax(acts, axis=1)
     correct = numpy.sum(numpy.equal(guess, targets.flatten()))
     print("Acts sz : " + str(acts.shape))
+    print("Acts : " + str(acts))
     print("Targets sz : " + str(targets.shape))
     print ("Guess " + str(guess.shape))
     print ("Targets " + str(targets.flatten().shape))
+    print ("Guess " + str(guess))
+    print ("Targets " + str(targets.flatten()))
     return (1. - correct / float(len(guess))) * 100.
 
 
@@ -333,6 +336,12 @@ def analyze(cli_params):
 
     print("data.train_ind " + str(data.train_ind))
     print("data.train_ind " + str(data.train_ind.shape))
+    print("data - keys " + str((data.keys())))
+    for k in data.keys():
+        if "_ind" in k:
+            print(k + " --> SZ: " + str(len(data[k])))
+        else:
+            print(k + " " + str(data[k].num_examples))
 
     if calc_batchnorm:
         logger.info('Calculating batch normalization for clean.labeled path')
