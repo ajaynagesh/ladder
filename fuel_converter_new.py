@@ -123,7 +123,7 @@ def emboot_converter():
     # creating the split using an API
     split_dict = {
         'train': {'features': (0, 10400), 'targets': (0, 10400)},
-         'test': {'features': (10400, 13001), 'targets': (10400, 13001)}}
+         'test': {'features': (10400, 13000), 'targets': (10400, 13000)}}
     f.attrs['split'] = H5PYDataset.create_split_array(split_dict)
 
     f.flush()
