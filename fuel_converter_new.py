@@ -104,7 +104,7 @@ def emboot_converter():
     test_sz = test_vector_features.shape[0]
     feat_sz = train_vector_features.shape[1]
     dataset_sz = train_sz + test_sz
-    dataset_sz_new = train_sz + test_sz - 16
+    dataset_sz_new = 13000 
 
     vector_features = f.create_dataset('features', (dataset_sz, feat_sz), dtype='float64')  ## train + test
     targets = f.create_dataset('targets', (dataset_sz, 1), dtype='uint8')
@@ -122,8 +122,8 @@ def emboot_converter():
     ## split attribute -- way to recover the splits
     # creating the split using an API
     split_dict = {
-        'train': {'features': (0, train_sz), 'targets': (0, train_sz)},
-         'test': {'features': (train_sz, dataset_sz_new-1), 'targets': (train_sz, dataset_sz_new-1)}}
+        'train': {'features': (0, 10400), 'targets': (0, 10400)},
+         'test': {'features': (10400, 13001), 'targets': (10400, 13001)}}
     f.attrs['split'] = H5PYDataset.create_split_array(split_dict)
 
     f.flush()
