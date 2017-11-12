@@ -28,8 +28,8 @@ from fuel.schemes import ShuffledScheme, SequentialScheme
 from fuel.streams import DataStream
 from fuel.transformers import Transformer
 
-# from fuel_converter_new import EMBOOT_NEW
-from fuel_converter import EMBOOT
+from fuel_converter_new import EMBOOT_NEW
+#from fuel_converter import EMBOOT
 
 from picklable_itertools import cycle, imap
 from itertools import izip, product, tee
@@ -236,8 +236,8 @@ def setup_data(p, test_set=False):
     dataset_class, training_set_size = {
         'cifar10': (CIFAR10, 40000),
         'mnist': (MNIST, 50000),
-        'emboot': (EMBOOT, 13000)
-        # 'emboot': (EMBOOT_NEW, 13000)
+        #'emboot': (EMBOOT, 13000)
+        'emboot': (EMBOOT_NEW, 13000)
     }[p.dataset]
 
     # Allow overriding the default from command line
@@ -326,10 +326,11 @@ def analyze(cli_params):
     p, _ = load_and_log_params(cli_params)
     _, data, whiten, cnorm = setup_data(p, test_set=True)
     ladder = setup_model(p)
-    p.data_type = 'train' ### RUN the evaluation on the TRAIN dataset ... 
+    # p.data_type = 'train' ### RUN the evaluation on the TRAIN dataset ... 
     # Analyze activations
+    print("------------------------------------------ Batch Sz = " + str(p.batch_size) + " ---------")
     dset, indices, calc_batchnorm = {
-        'train': (data.train, data.train_ind, True), ## Changing from False
+        'train': (data.train, data.train_ind, False),
         'valid': (data.valid, data.valid_ind, True),
         'test':  (data.test, data.test_ind, True),
     }[p.data_type]
