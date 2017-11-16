@@ -3,3 +3,11 @@ export FUEL_DATA_PATH="`pwd`/data"
 To run on another gpu: 
 
 THEANO_FLAGS=device=gpu1
+
+
+Adding a conda env to the jupyter notebook environments: need to manually install the environment in the jupyter kernel using ipykernel
+
+pip install ipykernel
+python -m ipykernel install --user --name ladder --display-name "Python (ladder)"
+
+(from here https://github.com/jupyter/jupyter/issues/245)

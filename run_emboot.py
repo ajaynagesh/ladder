@@ -28,8 +28,8 @@ from fuel.schemes import ShuffledScheme, SequentialScheme
 from fuel.streams import DataStream
 from fuel.transformers import Transformer
 
-from fuel_converter_new import EMBOOT_NEW
-#from fuel_converter import EMBOOT
+#from fuel_converter_new import EMBOOT_NEW
+from fuel_converter_onto import EMBOOT_ONTO
 
 from picklable_itertools import cycle, imap
 from itertools import izip, product, tee
@@ -150,6 +150,8 @@ def make_datastream(dataset, indices, batch_size,
         all_data = dataset.data_sources[dataset.sources.index('targets')]
         y = unify_labels(all_data)[indices]
         n_classes = y.max() + 1
+        print("n_labeled " + str(n_labeled))
+        print("n_classes " + str(n_classes))
         assert n_labeled % n_classes == 0
         n_from_each_class = n_labeled / n_classes
 
@@ -236,8 +238,8 @@ def setup_data(p, test_set=False):
     dataset_class, training_set_size = {
         'cifar10': (CIFAR10, 40000),
         'mnist': (MNIST, 50000),
-        #'emboot': (EMBOOT, 13000)
-        'emboot': (EMBOOT_NEW, 13000)
+        'emboot': (EMBOOT_ONTO, 67000)
+        #'emboot': (EMBOOT_NEW, 13000)
     }[p.dataset]
 
     # Allow overriding the default from command line
