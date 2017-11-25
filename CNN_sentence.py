@@ -34,7 +34,9 @@ from fuel.streams import DataStream
 from toolz.itertoolz import interleave
 from fuel_converter_sst import SST2
 
-
+from blocks.graph import apply_dropout
+from blocks.filter import VariableFilter
+from blocks.roles import  INPUT
 
 class LeNet(FeedforwardSequence, Initializable):
     """LeNet-like convolutional network.
@@ -86,24 +88,29 @@ class LeNet(FeedforwardSequence, Initializable):
         self.top_mlp_dims = top_mlp_dims
         self.border_mode = border_mode
 
-        conv_parameters = zip(filter_sizes, feature_maps)
+        conv_parameters = [(i, j) for i in filter_sizes for j in feature_maps]
 
         # Construct convolutional layers with corresponding parameters
-        self.layers = list(interleave([
-            (Convolutional(filter_size=filter_size,
+        self.layers = []
+        self.conv_sequence = []
+        for i, (filter_size, num_filter) in enumerate(conv_parameters):
+
+            self.layers.append(list([
+                (Convolutional(filter_size=filter_size,
                            num_filters=num_filter,
                            step=self.conv_step,
                            border_mode=self.border_mode,
                            name='conv_{}'.format(i))
-             for i, (filter_size, num_filter)
-             in enumerate(conv_parameters)),
-            conv_activations,
-            (MaxPooling(size, name='pool_{}'.format(i))
-             for i, size in enumerate(pooling_sizes))]))
+                ),
+                conv_activations[0],
+                MaxPooling(pooling_size=pooling_sizes[i], name='pool_{}'.format(i))]))
 
-        self.conv_sequence = ConvolutionalSequence(self.layers, num_channels,
-                                                   image_size=image_shape)
 
+            self.conv_sequence.append(ConvolutionalSequence(self.layers[i], num_channels,
+                                                   image_size=image_shape, name='conv_seq_{}'.format(i)))
+
+
+        conv_applications = [conv.apply for conv in self.conv_sequence]
         # Construct a top MLP
         self.top_mlp = MLP(top_mlp_activations, top_mlp_dims)
 
@@ -111,8 +118,7 @@ class LeNet(FeedforwardSequence, Initializable):
         # This brick accepts a tensor of dimension (batch_size, ...) and
         # returns a matrix (batch_size, features)
         self.flattener = Flattener()
-        application_methods = [self.conv_sequence.apply, self.flattener.apply,
-                               self.top_mlp.apply]
+        application_methods = conv_applications + [self.flattener.apply, self.top_mlp.apply]
         super(LeNet, self).__init__(application_methods, **kwargs)
 
     @property
@@ -124,8 +130,9 @@ class LeNet(FeedforwardSequence, Initializable):
         self.top_mlp_dims[-1] = value
 
     def _push_allocation_config(self):
-        self.conv_sequence._push_allocation_config()
-        conv_out_dim = self.conv_sequence.get_dim('output')
+        [conv._push_allocation_config() for conv in self.conv_sequence]
+        conv_dimensions = [conv.get_dim('output') for conv in self.conv_sequence]
+        conv_out_dim = (300, 1, 1) #sum(conv_dimensions)
 
         self.top_mlp.activations = self.top_mlp_activations
         self.top_mlp.dims = [numpy.prod(conv_out_dim)] + self.top_mlp_dims
@@ -134,11 +141,14 @@ class LeNet(FeedforwardSequence, Initializable):
 def main(save_to, num_epochs, feature_maps=None, mlp_hiddens=None,
          conv_sizes=None, pool_sizes=None, batch_size=100,
          num_batches=None):
-
-    feature_maps = [100]
-    conv_sizes = [(3, 300), (4, 300), (5, 300)]
-    mlp_hiddens = [100]
-    pool_sizes = [(300-3+1, 1), (300-4+1, 1), (300-5+1, 1)]
+    if feature_maps is None:
+        feature_maps = [100]
+    if mlp_hiddens is None:
+        mlp_hiddens = [100]
+    if conv_sizes is None:
+        conv_sizes = [(3, 300), (4, 300), (5, 300)]
+    if pool_sizes is None:
+        pool_sizes = [(61-3+1, 1), (61-4+1, 1), (61-5+1, 1)]
     image_size = (61, 300)
     output_size = 2
 
@@ -151,14 +161,14 @@ def main(save_to, num_epochs, feature_maps=None, mlp_hiddens=None,
                     pooling_sizes=pool_sizes,
                     top_mlp_activations=mlp_activations,
                     top_mlp_dims=mlp_hiddens + [output_size],
-                    border_mode='full',
+                    border_mode='valid',
                     weights_init=Uniform(width=.2),
                     biases_init=Constant(0))
     # We push initialization config to set different initialization schemes
     # for convolutional layers.
     convnet.push_initialization_config()
-    convnet.layers[0].weights_init = Uniform(width=.2)
-    convnet.layers[1].weights_init = Uniform(width=.09)
+    # convnet.layers[0].weights_init = Uniform(width=.2)
+    # convnet.layers[1].weights_init = Uniform(width=.09)
     convnet.top_mlp.linear_transformations[0].weights_init = Uniform(width=.08)
     convnet.top_mlp.linear_transformations[1].weights_init = Uniform(width=.11)
     convnet.initialize()
@@ -183,20 +193,23 @@ def main(save_to, num_epochs, feature_maps=None, mlp_hiddens=None,
 
     cg = ComputationGraph([cost, error_rate])
 
-    mnist_train = SST2(("train",))
-    mnist_train_stream = DataStream.default_stream(
-        mnist_train, iteration_scheme=ShuffledScheme(
-            mnist_train.num_examples, batch_size))
+    dropout_var = [var for var in VariableFilter(roles=[INPUT])(cg.variables) if var.name == 'linear_0_apply_input_']
+    cg_with_dropout = apply_dropout(cg, dropout_var, 0.5)
 
-    mnist_test = SST2(("dev",))
-    mnist_test_stream = DataStream.default_stream(
-        mnist_test,
+    sst2_train = SST2(("train",))
+    sst2_train_stream = DataStream.default_stream(
+        sst2_train, iteration_scheme=ShuffledScheme(
+            sst2_train.num_examples, batch_size))
+
+    sst2_test = SST2(("dev",))
+    sst2_test_stream = DataStream.default_stream(
+        sst2_test,
         iteration_scheme=ShuffledScheme(
-            mnist_test.num_examples, batch_size))
+            sst2_test.num_examples, batch_size))
 
     # Train with simple SGD
     algorithm = GradientDescent(
-        cost=cost, parameters=cg.parameters,
+        cost=cost, parameters=cg_with_dropout.parameters,
         step_rule=Scale(learning_rate=0.1))
     # `Timing` extension reports time for reading data, aggregating a batch
     # and monitoring;
@@ -206,7 +219,7 @@ def main(save_to, num_epochs, feature_maps=None, mlp_hiddens=None,
                               after_n_batches=num_batches),
                   DataStreamMonitoring(
                       [cost, error_rate],
-                      mnist_test_stream,
+                      sst2_test_stream,
                       prefix="test"),
                   TrainingDataMonitoring(
                       [cost, error_rate,
@@ -221,7 +234,7 @@ def main(save_to, num_epochs, feature_maps=None, mlp_hiddens=None,
 
     main_loop = MainLoop(
         algorithm,
-        mnist_train_stream,
+        sst2_train_stream,
         model=model,
         extensions=extensions)
 
@@ -231,23 +244,24 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     parser = ArgumentParser("An example of training a convolutional network "
                             "on the MNIST dataset.")
-    parser.add_argument("--num-epochs", type=int, default=2,
+    parser.add_argument("--num-epochs", type=int, default=100,
                         help="Number of training epochs to do.")
-    parser.add_argument("save_to", default="mnist.pkl", nargs="?",
+    parser.add_argument("save_to", default="sst2.pkl", nargs="?",
                         help="Destination to save the state of the training "
                              "process.")
     parser.add_argument("--feature-maps", type=int, nargs='+',
-                        default=[20, 50], help="List of feature maps numbers.")
-    parser.add_argument("--mlp-hiddens", type=int, nargs='+', default=[500],
+                        default=[100], help="List of feature maps numbers.")
+    parser.add_argument("--mlp-hiddens", type=int, nargs='+', default=[100],
                         help="List of numbers of hidden units for the MLP.")
-    parser.add_argument("--conv-sizes", type=int, nargs='+', default=[5, 5],
+    parser.add_argument("--conv-sizes", type=int, nargs='+', default=[(3, 300)],
                         help="Convolutional kernels sizes. The kernels are "
                         "always square.")
-    parser.add_argument("--pool-sizes", type=int, nargs='+', default=[2, 2],
+    parser.add_argument("--pool-sizes", type=int, nargs='+', default=[(61+3-1, 1)],
                         help="Pooling sizes. The pooling windows are always "
                              "square. Should be the same length as "
                              "--conv-sizes.")
-    parser.add_argument("--batch-size", type=int, default=500,
+    parser.add_argument("--batch-size", type=int, default=100,
                         help="Batch size.")
     args = parser.parse_args()
-    main(**vars(args))
+    # main(**vars(args))
+    main('sst2_100_with_dropout.pkl', 100)
