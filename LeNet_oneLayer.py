@@ -34,6 +34,10 @@ from fuel.streams import DataStream
 from toolz.itertoolz import interleave
 from fuel_converter_sst import SST2
 
+from blocks.graph import apply_dropout
+from blocks.filter import VariableFilter
+from blocks.roles import  INPUT
+
 class LeNet(FeedforwardSequence, Initializable):
     """LeNet-like convolutional network.
 
@@ -184,6 +188,9 @@ def main(save_to, num_epochs, feature_maps=None, mlp_hiddens=None,
 
     cg = ComputationGraph([cost, error_rate])
 
+    dropout_var = [var for var in VariableFilter(roles=[INPUT])(cg.variables) if var.name == 'linear_0_apply_input_']
+    cg_with_dropout = apply_dropout(cg, dropout_var, 0.5)
+
     sst2_train = SST2(("train",))
     sst2_train_stream = DataStream.default_stream(
         sst2_train, iteration_scheme=ShuffledScheme(
@@ -197,7 +204,7 @@ def main(save_to, num_epochs, feature_maps=None, mlp_hiddens=None,
 
     # Train with simple SGD
     algorithm = GradientDescent(
-        cost=cost, parameters=cg.parameters,
+        cost=cost, parameters=cg_with_dropout.parameters,
         step_rule=Scale(learning_rate=0.1))
     # `Timing` extension reports time for reading data, aggregating a batch
     # and monitoring;
@@ -251,4 +258,5 @@ if __name__ == "__main__":
     parser.add_argument("--batch-size", type=int, default=100,
                         help="Batch size.")
     args = parser.parse_args()
-    main(**vars(args))
+    # main(**vars(args))
+    main('sst2_100_with_dropout.pkl', 100)
