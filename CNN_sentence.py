@@ -36,7 +36,7 @@ from blocks.roles import  INPUT
 
 def ConvBrick_1D(num_channels, image_shape,
              filter_size, feature_maps, pooling_size, i=0,
-             weights_init=Uniform(width=.2), biases_init=Constant(0)):
+             weights_init=Uniform(width=.02), biases_init=Constant(0)):
 
     conv = Convolutional(filter_size=filter_size,
                    num_filters=feature_maps,
@@ -77,15 +77,15 @@ def main(save_to, num_epochs, num_batches=None, batch_size=50):
                            filter_size=filter_size,
                            feature_maps=num_filter,
                            pooling_size=pool_sizes[i], i=i,
-                           weights_init=Uniform(width=.2),
+                           weights_init=Uniform(width=.02),
                            biases_init=Constant(0))
 
         conv.push_allocation_config()
         conv.push_initialization_config()
         ### initialize each of the conv1d bricks
-        conv.layers[0].weights_init = Uniform(width=.2)
-        conv.layers[1].weights_init = Uniform(width=.09)
-        conv.layers[2].weights_init = Uniform(width=.09)
+        # conv.layers[0].weights_init = Uniform(width=.02)
+        # conv.layers[1].weights_init = Uniform(width=.09)
+        # conv.layers[2].weights_init = Uniform(width=.09)
         conv.initialize()
         conv_1d.append(conv)
 
@@ -96,7 +96,10 @@ def main(save_to, num_epochs, num_batches=None, batch_size=50):
 
     # Construct a top MLP
     mlp_activations = [Rectifier() for _ in mlp_hiddens] + [Softmax()]
-    top_mlp = MLP(mlp_activations, dims=[300,100,2]) ## TODO: Need to parameterize this
+    top_mlp = MLP(mlp_activations, dims=[300, 100, 2], ## TODO: Need to parameterize this
+                  weights_init=Uniform(width=.02), biases_init=Constant(0)) ## TODO: Need to parameterize this
+
+    top_mlp.initialize()
 
     probs = top_mlp.apply(mlp_input_tensor)
 
@@ -128,7 +131,7 @@ def main(save_to, num_epochs, num_batches=None, batch_size=50):
         sst2_train, iteration_scheme=ShuffledScheme(
             sst2_train.num_examples, batch_size))
 
-    sst2_test = SST2(("dev",))
+    sst2_test = SST2(("test",))
     sst2_test_stream = DataStream.default_stream(
         sst2_test,
         iteration_scheme=ShuffledScheme(
