@@ -22,7 +22,7 @@ from blocks.extensions.monitoring import (DataStreamMonitoring,
                                           TrainingDataMonitoring)
 from blocks.extensions.saveload import Checkpoint
 from blocks.graph import ComputationGraph
-from blocks.initialization import Constant, Uniform
+from blocks.initialization import Constant, Uniform, IsotropicGaussian
 from blocks.main_loop import MainLoop
 from blocks.model import Model
 from blocks.monitoring import aggregation
@@ -97,7 +97,7 @@ def main(save_to, num_epochs, num_batches=None, batch_size=50):
     # Construct a top MLP
     mlp_activations = [Rectifier() for _ in mlp_hiddens] + [Softmax()]
     top_mlp = MLP(mlp_activations, dims=[300, 100, 2], ## TODO: Need to parameterize this
-                  weights_init=Uniform(width=.02), biases_init=Constant(0)) ## TODO: Need to parameterize this
+                  weights_init=IsotropicGaussian(std=1,mean=0.01), biases_init=Constant(0)) ## TODO: Need to parameterize this
 
     top_mlp.initialize()
 
@@ -123,8 +123,8 @@ def main(save_to, num_epochs, num_batches=None, batch_size=50):
 
     cg = ComputationGraph([cost, error_rate])
 
-    # dropout_var = [var for var in VariableFilter(roles=[INPUT])(cg.variables) if var.name == 'linear_0_apply_input_']
-    # cg_with_dropout = apply_dropout(cg, dropout_var, 0.5)
+    dropout_var = [var for var in VariableFilter(roles=[INPUT])(cg.variables) if var.name == 'linear_0_apply_input_']
+    cg_with_dropout = apply_dropout(cg, dropout_var, 0.5)
 
     sst2_train = SST2(("train",))
     sst2_train_stream = DataStream.default_stream(
@@ -139,7 +139,7 @@ def main(save_to, num_epochs, num_batches=None, batch_size=50):
 
     # Train with simple SGD
     algorithm = GradientDescent(
-        cost=cost, parameters=cg.parameters,
+        cost=cost, parameters=cg_with_dropout.parameters,
         step_rule=Scale(learning_rate=0.1))
     # `Timing` extension reports time for reading data, aggregating a batch
     # and monitoring;
@@ -174,7 +174,7 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
     parser = ArgumentParser("An example of training a convolutional network "
                             "on the MNIST dataset.")
-    parser.add_argument("--num-epochs", type=int, default=100,
+    parser.add_argument("--num-epochs", type=int, default=25,
                         help="Number of training epochs to do.")
     parser.add_argument("--save_to", default="sst2.pkl", nargs="?",
                         help="Destination to save the state of the training "
