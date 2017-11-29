@@ -12,7 +12,7 @@ from argparse import ArgumentParser
 
 from theano import tensor
 
-from blocks.algorithms import GradientDescent, Scale
+from blocks.algorithms import GradientDescent, Scale, CompositeRule, StepClipping, AdaDelta
 from blocks.bricks import (MLP, Rectifier, Softmax)
 from blocks.bricks.conv import (Convolutional, ConvolutionalSequence,
                                 Flattener, MaxPooling)
@@ -140,7 +140,7 @@ def main(save_to, num_epochs, num_batches=None, batch_size=50):
     # Train with simple SGD
     algorithm = GradientDescent(
         cost=cost, parameters=cg_with_dropout.parameters,
-        step_rule=Scale(learning_rate=0.1))
+        step_rule=CompositeRule([StepClipping(threshold=3), AdaDelta()]) )
     # `Timing` extension reports time for reading data, aggregating a batch
     # and monitoring;
     # `ProgressBar` displays a nice progress bar during training.
