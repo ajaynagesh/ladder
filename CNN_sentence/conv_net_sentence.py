@@ -288,7 +288,7 @@ def make_idx_data_cv(revs, word_idx_map, cv, max_l=51, k=300, filter_h=5):
 
 def load_sst2_dataset():
     harv_dataset = "/work/ajaynagesh/LadderNetworks/ladder.sentiment/data/SST2.harvard.hdf5"
-    dataset_harv = h5py.File((harv_dataset, 'r'))
+    dataset_harv = h5py.File(harv_dataset, 'r')
 
     train_phrases = dataset_harv['train'].value
     train_targets = dataset_harv['train_label'].value
