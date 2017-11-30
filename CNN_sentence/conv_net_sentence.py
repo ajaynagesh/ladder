@@ -291,10 +291,10 @@ def load_sst2_dataset():
     dataset_harv = h5py.File(harv_dataset, 'r')
 
     train_phrases = dataset_harv['train'].value.astype(dtype='float32')
-    train_targets = dataset_harv['train_label'].value
+    train_targets = dataset_harv['train_label'].value.astype(dtype='float32')
 
     test_sents = dataset_harv['test'].value.astype(dtype='float32')
-    test_targets = dataset_harv['test_label'].value
+    test_targets = dataset_harv['test_label'].value.astype(dtype='float32')
 
     w2v = dataset_harv['w2v'].value
 
