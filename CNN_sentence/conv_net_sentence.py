@@ -290,10 +290,10 @@ def load_sst2_dataset():
     harv_dataset = "/work/ajaynagesh/LadderNetworks/ladder.sentiment/data/SST2.harvard.hdf5"
     dataset_harv = h5py.File(harv_dataset, 'r')
 
-    train_phrases = dataset_harv['train'].value
+    train_phrases = dataset_harv['train'].value.astype(dtype='float32')
     train_targets = dataset_harv['train_label'].value
 
-    test_sents = dataset_harv['test'].value
+    test_sents = dataset_harv['test'].value.astype(dtype='float32')
     test_targets = dataset_harv['test_label'].value
 
     w2v = dataset_harv['w2v'].value
