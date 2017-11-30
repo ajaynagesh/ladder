@@ -57,8 +57,8 @@ def train_conv_net(datasets,
     hidden_units = [x,y] x is the number of feature maps (per filter window), and y is the penultimate layer
     sqr_norm_lim = s^2 in the paper
     lr_decay = adadelta decay parameter
-    """    
-    rng = np.random.RandomState(3435)
+    """
+    rng = np.random.RandomState() # rng = np.random.RandomState(3435)
     img_h = len(datasets[0][0])-1  
     filter_w = img_w    
     feature_maps = hidden_units[0]
