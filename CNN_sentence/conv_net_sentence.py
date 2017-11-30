@@ -296,7 +296,7 @@ def load_sst2_dataset():
     test_sents = dataset_harv['test'].value.astype(dtype='float32')
     test_targets = dataset_harv['test_label'].value.astype(dtype='float32')
 
-    w2v = dataset_harv['w2v'].value
+    w2v = dataset_harv['w2v'].value.astype(dtype='float32')
 
     train_dataset = np.concatenate([train_phrases,
                             np.expand_dims(train_targets, axis=0).T], axis=1)
