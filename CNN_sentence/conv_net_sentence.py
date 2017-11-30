@@ -326,6 +326,7 @@ if __name__=="__main__":
     execfile("conv_net_classes.py")    
     if word_vectors=="-rand":
         print "using: random vectors"
+        W2 = np.random.randn(W.shape[0], W.shape[1]).astype(np.float32)
         U = W2
     elif word_vectors=="-word2vec":
         print "using: word2vec vectors"
