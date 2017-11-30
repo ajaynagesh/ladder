@@ -109,7 +109,7 @@ def train_conv_net(datasets,
     
     #shuffle dataset and assign to mini batches. if dataset size is not a multiple of mini batches, replicate 
     #extra data (at random)
-    np.random.seed(3435)
+    np.random.seed() # np.random.seed(3435) NOTE: Removing the seed as it was goving identical results
     if datasets[0].shape[0] % batch_size > 0:
         extra_data_num = batch_size - datasets[0].shape[0] % batch_size
         train_set = np.random.permutation(datasets[0])   
