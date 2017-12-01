@@ -44,12 +44,21 @@ def load_harv_sst_dataset(sst_dataset):
     dev_sents = dataset_harv['dev'].value
     dev_targets = dataset_harv['dev_label'].value
 
+    #### VERY IMPT: THE TORCH ARRAYS ARE INDEXED FROM 1. But when loaded using HDF5 IT is ZERO INDEXED.
+    ### So w2v INDICES WHERE GETTING SCREWED
+    ### REDUCING THE INDICES BY 1
+    train_phrases = train_phrases - 1
+    train_targets = train_targets - 1
+    test_sents = test_sents - 1
+    test_targets = test_targets - 1
+    dev_sents = dev_sents - 1
+    dev_targets = dev_targets - 1
+
     w2v = dataset_harv['w2v'].value
 
-    ## note: the w2v mappings are indexed from 1
-    train_features = np.stack([w2v[sent-1] for sent in train_phrases], axis=0)
-    test_features = np.stack([w2v[sent-1] for sent in test_sents], axis=0)
-    dev_features = np.stack([w2v[sent - 1] for sent in dev_sents], axis=0)
+    train_features = np.stack([w2v[sent] for sent in train_phrases], axis=0)
+    test_features = np.stack([w2v[sent] for sent in test_sents], axis=0)
+    dev_features = np.stack([w2v[sent] for sent in dev_sents], axis=0)
 
     return train_features, train_targets, \
            test_features, test_targets, \

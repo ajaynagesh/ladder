@@ -97,7 +97,7 @@ def main(save_to, num_epochs, num_batches=None, batch_size=50):
     # Construct a top MLP
     mlp_activations = [Rectifier() for _ in mlp_hiddens] + [Softmax()]
     top_mlp = MLP(mlp_activations, dims=[300, 100, 2], ## TODO: Need to parameterize this
-                  weights_init=Uniform(width=.02), biases_init=Constant(0)) ## TODO: Need to parameterize this
+                  weights_init=IsotropicGaussian(std=1, mean=0.01), biases_init=Constant(0)) ## TODO: Need to parameterize this
 ##Uniform(width=.02),
     top_mlp.initialize()
 
