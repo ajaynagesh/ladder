@@ -19,7 +19,7 @@ import re
 import warnings
 import sys
 import time
-warnings.filterwarnings("ignore")   
+warnings.filterwarnings("ignore")
 
 #different non-linearities
 def ReLU(x):
@@ -283,7 +283,7 @@ def make_idx_data_cv(revs, word_idx_map, cv, max_l=51, k=300, filter_h=5):
             train.append(sent)   
     train = np.array(train,dtype="int")
     test = np.array(test,dtype="int")
-    return [train, test]     
+    return [train, test]
 
 
 def load_sst2_dataset():
@@ -299,10 +299,16 @@ def load_sst2_dataset():
     w2v = dataset_harv['w2v'].value.astype(dtype='float32')
 
     train_dataset = np.concatenate([train_phrases,
-                            np.expand_dims(train_targets, axis=0).T], axis=1)
+                                    np.expand_dims(train_targets, axis=0).T], axis=1)
 
     test_dataset = np.concatenate([test_sents,
-                                    np.expand_dims(test_targets, axis=0).T], axis=1)
+                                   np.expand_dims(test_targets, axis=0).T], axis=1)
+
+    #### VERY IMPT: THE TORCH ARRAYS ARE INDEXED FROM 1. But when loaded using HDF5 IT is ZERO INDEXED.
+    ### So w2v INDICES WHERE GETTING SCREWED
+    ### REDUCING THE INDICES BY 1
+    train_dataset = train_dataset - 1
+    test_dataset = test_dataset - 1
 
     datasets = [train_dataset, test_dataset]
     return datasets, w2v
@@ -326,7 +332,8 @@ if __name__=="__main__":
     execfile("conv_net_classes.py")    
     if word_vectors=="-rand":
         print "using: random vectors"
-        W2 = np.random.randn(W.shape[0], W.shape[1]).astype(np.float32)
+        W2 = np.random.r
+        andn(W.shape[0], W.shape[1]).astype(np.float32)
         U = W2
     elif word_vectors=="-word2vec":
         print "using: word2vec vectors"
