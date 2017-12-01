@@ -131,7 +131,7 @@ def main(save_to, num_epochs, num_batches=None, batch_size=50):
         sst2_train, iteration_scheme=ShuffledScheme(
             sst2_train.num_examples, batch_size))
 
-    sst2_test = SST2(("test",))
+    sst2_test = SST2(("dev",))
     sst2_test_stream = DataStream.default_stream(
         sst2_test,
         iteration_scheme=ShuffledScheme(
@@ -150,7 +150,7 @@ def main(save_to, num_epochs, num_batches=None, batch_size=50):
                   DataStreamMonitoring(
                       [cost, error_rate],
                       sst2_test_stream,
-                      prefix="test"),
+                      prefix="dev"),
                   TrainingDataMonitoring(
                       [cost, error_rate,
                        aggregation.mean(algorithm.total_gradient_norm)],
