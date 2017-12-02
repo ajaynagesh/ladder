@@ -4,16 +4,14 @@ import functools
 import logging
 import os
 import subprocess
+import sys
+import time
 from argparse import ArgumentParser, Action
 from collections import OrderedDict
-import sys
-from pandas import DataFrame
+from itertools import izip, product, tee
 
 import numpy
-import time
 import theano
-from theano.tensor.type import TensorType
-
 from blocks.algorithms import GradientDescent, Adam
 from blocks.extensions import FinishAfter
 from blocks.extensions.monitoring import TrainingDataMonitoring
@@ -23,16 +21,15 @@ from blocks.main_loop import MainLoop
 from blocks.model import Model
 from blocks.roles import PARAMETER
 from fuel.datasets import MNIST, CIFAR10
-
 from fuel.schemes import ShuffledScheme, SequentialScheme
 from fuel.streams import DataStream
 from fuel.transformers import Transformer
-
-#from fuel_converter_new import EMBOOT_NEW
-from fuel_converter_onto import EMBOOT_ONTO
-
+from pandas import DataFrame
 from picklable_itertools import cycle, imap
-from itertools import izip, product, tee
+from theano.tensor.type import TensorType
+
+# from fuel_converter_new import EMBOOT_NEW
+from processData.fuel_converter_onto import EMBOOT_ONTO
 
 logger = logging.getLogger('main')
 

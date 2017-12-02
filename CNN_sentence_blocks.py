@@ -10,9 +10,7 @@ It is going to reach around 0.8% error rate on the test set.
 import logging
 from argparse import ArgumentParser
 
-from theano import tensor
-
-from blocks.algorithms import GradientDescent, Scale, CompositeRule, StepClipping, AdaDelta
+from blocks.algorithms import GradientDescent, CompositeRule, StepClipping, AdaDelta
 from blocks.bricks import (MLP, Rectifier, Softmax)
 from blocks.bricks.conv import (Convolutional, ConvolutionalSequence,
                                 Flattener, MaxPooling)
@@ -21,18 +19,20 @@ from blocks.extensions import FinishAfter, Timing, Printing, ProgressBar
 from blocks.extensions.monitoring import (DataStreamMonitoring,
                                           TrainingDataMonitoring)
 from blocks.extensions.saveload import Checkpoint
+from blocks.filter import VariableFilter
 from blocks.graph import ComputationGraph
+from blocks.graph import apply_dropout
 from blocks.initialization import Constant, Uniform, IsotropicGaussian
 from blocks.main_loop import MainLoop
 from blocks.model import Model
 from blocks.monitoring import aggregation
+from blocks.roles import INPUT
 from fuel.schemes import ShuffledScheme
 from fuel.streams import DataStream
-from fuel_converter_sst import SST2
+from theano import tensor
 
-from blocks.graph import apply_dropout
-from blocks.filter import VariableFilter
-from blocks.roles import  INPUT
+from processData.fuel_converter_sst import SST2
+
 
 def ConvBrick_1D(num_channels, image_shape,
              filter_size, feature_maps, pooling_size, i=0,
