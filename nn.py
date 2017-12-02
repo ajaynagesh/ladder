@@ -2,6 +2,7 @@ from collections import OrderedDict
 import logging
 
 import scipy
+from scipy import sparse, linalg
 import numpy as np
 from theano import tensor
 from theano.tensor.signal.pool import pool_2d, Pool
@@ -285,7 +286,9 @@ def pool_2d(x, mode="average", ws=(2, 2), stride=(2, 2)):
 
 
 def maxpool_2d(z, in_dim, poolsize, poolstride):
-    z = pool_2d(z, ds=poolsize, st=poolstride)
+    print(poolsize)
+    print(poolstride)
+    z = pool_2d(z, ws=poolsize, stride=poolstride)
     output_size = tuple(Pool.out_shape(in_dim, poolsize, st=poolstride))
     return z, output_size
 
