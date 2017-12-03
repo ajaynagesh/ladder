@@ -230,5 +230,5 @@ if __name__ == "__main__":
     # sst_fuel_dataset2 = "./data/SST2.fuel.hdf5"
     # sst_converter(sst_harv_dataset2, sst_fuel_dataset2)
 
-    sst_fuel_dataset2 = "../data/SST2.fuel.mod.hdf5"
+    sst_fuel_dataset2 = "./data/SST2.fuel.mod.hdf5"
     sst_converter_expand_dims_mod(sst_harv_dataset2, sst_fuel_dataset2) ## NOTE: calling the mod function to make the train and test whole numbers when divided by batch_sz TODO: Change this ... ?
