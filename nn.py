@@ -286,8 +286,6 @@ def global_meanpool_2d(x, num_filters):
 
 
 def maxpool_2d(z, in_dim, poolsize, poolstride):
-    print(poolsize)
-    print(poolstride)
     z = pool_2d(z, ds=poolsize, st=poolstride)
     output_size = tuple(Pool.out_shape(in_dim, poolsize, st=poolstride))
     return z, output_size
