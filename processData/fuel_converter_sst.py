@@ -196,9 +196,9 @@ def sst_converter_expand_dims_mod(sst_harv_dataset, sst_fuel_dataset):
     targets = f.create_dataset('targets', (dataset_sz, 1), dtype='uint8')
 
     ## put the data loaded into these objects
-    sent_features[...] = np.vstack([train_features[:dataset_sz], dev_features, test_features[:dataset_sz]])
-    targets[...] = np.vstack([np.expand_dims(train_targets[:dataset_sz],axis=1), np.expand_dims(dev_targets,axis=1),
-                              np.expand_dims(test_targets[:dataset_sz],axis=1)])
+    sent_features[...] = np.vstack([train_features[:train_sz], dev_features, test_features[:test_sz]])
+    targets[...] = np.vstack([np.expand_dims(train_targets[:train_sz],axis=1), np.expand_dims(dev_targets,axis=1),
+                              np.expand_dims(test_targets[:test_sz],axis=1)])
 
     ## label the dims with names
     sent_features.dims[0].label = 'batch'
