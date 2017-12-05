@@ -176,19 +176,51 @@ class LadderAE():
             d.labeled = self.new_activation_dict()
             d.labeled.z[0] = self.labeled(h)
             d.unlabeled.z[0] = self.unlabeled(h)
-            prev_dim = input_dim
-            for i, (spec, _, act_f) in layers[1:]:
+
+            ## layers
+            ## --------------------
+            ## convv:100:3:300:1
+            ## maxpool:59:1
+            ## convv:100:4:300:1
+            ## maxpool:58:1
+            ## convv:100:5:300:1
+            ## maxpool:57:1
+            ## mlp:100:2
+
+            conv_plus_pool_outputs = []
+            for i, (spec, _, act_f) in layers[1:]: ## Handle the last element of the layer outside the loop
+
+                if i == len(layers) - 1: # last layer
+                    h = T.concatenate(conv_plus_pool_outputs, axis=1)
+                    prev_dim = 300 #TODO: Rmove the hardcoding
+
+                elif i % 2 == 1: ## convv layer
+                    h = input_
+                    prev_dim = input_dim
+
+                else: ## maxpool layer
+                    h = h_out
+                    prev_dim = curr_dim
+
                 d.labeled.h[i - 1], d.unlabeled.h[i - 1] = self.split_lu(h)
                 noise = noise_std[i] if i < len(noise_std) else 0.
-                curr_dim, z, m, s, h = self.f(h, prev_dim, spec, i, act_f,
+
+
+                curr_dim, z, m, s, h_out = self.f(h, prev_dim, spec, i, act_f,
                                               path_name=path_name,
                                               noise_std=noise)
+
+
                 assert self.layer_dims.get(i) in (None, curr_dim)
                 self.layer_dims[i] = curr_dim
+
                 d.labeled.z[i], d.unlabeled.z[i] = self.split_lu(z)
                 d.unlabeled.s[i] = s
                 d.unlabeled.m[i] = m
-                prev_dim = curr_dim
+
+                if i % 2 == 0: ## maxpool layer -- collect all the outputs -- to be used by `mlp`
+                    conv_plus_pool_outputs.append(h_out)
+
             d.labeled.h[i], d.unlabeled.h[i] = self.split_lu(h)
             return d
 
@@ -422,17 +454,17 @@ class LadderAE():
             # scale the variance to match normal conv layers with xavier init
             y = y * np.float32(in_dim[-1]) * np.float32(np.sqrt(3))
         else:
-            assert dims[0] != 1 or dims[1] != 1
+            assert dims[0] != 1 or dims[1] != 1  # TODO: Check this ?
             y, output_size = maxpool_2d(x, in_dim,
-                                        poolsize=(dims[1], dims[1]),
-                                        poolstride=(dims[0], dims[0]))
+                                        poolsize=(dims[0], dims[1]),
+                                        poolstride=(dims[0], dims[1]))
         return y, output_size
 
     def f_conv(self, x, spec, in_dim, weight_name):
         layer_type, dims = spec
         num_filters = dims[0]
-        filter_size = (dims[1], dims[1])
-        stride = (dims[2], dims[2])
+        filter_size = (dims[1], dims[2])
+        stride = (1, 1) ## HARDCODING
 
         bm = 'full' if 'convf' in layer_type else 'valid'
 
