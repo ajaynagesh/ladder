@@ -249,21 +249,33 @@ class LadderAE():
                 ver_dim = self.layer_dims[i]
                 out_dims = (300, 1, 1)
                 top_g = True
+                print ('Top = ', top)
             else:
-                out_dims = self.layer_dims[i]
                 top_g = False
-
-                if i % 2 == 0 and i != 0 : ## maxpool layer
+                if i % 2 == 0 and i != 0:  ## maxpool layer
                     ver_dim = (100, 1, 1)
+                    #                     print ('---out dims ', out_dims)
                     if i == 6:
-                        ver = est.z.get(7)[200:]
+                        ver = est.z.get(top)[200:]
+                        out_dims = (100, 57, 1)
                     elif i == 4:
-                        ver = est.z.get(7)[100:200]
+                        ver = est.z.get(top)[100:200]
+                        out_dims = (100, 58, 1)
                     elif i == 2:
-                        ver = est.z.get(7)[0:100]
-                elif i % 2 == 1: ## conv layer
+                        ver = est.z.get(top)[0:100]
+                        out_dims = (100, 59, 1)
+                elif i % 2 == 1:  ## conv layer
                     ver = est.z.get(i + 1)
-                    ver_dim = self.layer_dims.get(i + 1)
+                    if i == 5:
+                        ver_dim = (100, 57, 1)
+                    if i == 3:
+                        ver_dim = (100, 58, 1)
+                    if i == 1:
+                        ver_dim = (100, 59, 1)
+                    out_dims = self.layer_dims[0]
+
+                else:
+                    break
 
             z_est = self.g(z_lat=z_corr,
                            z_ver=ver,
