@@ -247,20 +247,32 @@ class LadderAE():
             if i == top:
                 ver = corr.unlabeled.h[i]
                 ver_dim = self.layer_dims[i]
+                out_dims = (300, 1, 1)
                 top_g = True
             else:
-                ver = est.z.get(i + 1)
-                ver_dim = self.layer_dims.get(i + 1)
+                out_dims = self.layer_dims[i]
                 top_g = False
+
+                if i % 2 == 0 and i != 0 : ## maxpool layer
+                    ver_dim = (100, 1, 1)
+                    if i == 6:
+                        ver = est.z.get(7)[200:]
+                    elif i == 4:
+                        ver = est.z.get(7)[100:200]
+                    elif i == 2:
+                        ver = est.z.get(7)[0:100]
+                elif i % 2 == 1: ## conv layer
+                    ver = est.z.get(i + 1)
+                    ver_dim = self.layer_dims.get(i + 1)
 
             z_est = self.g(z_lat=z_corr,
                            z_ver=ver,
                            in_dims=ver_dim,
-                           out_dims=self.layer_dims[i],
+                           out_dims=out_dims,
                            l_type=l_type,
                            num=i,
                            fspec=fspec,
-                           top_g=top_g)
+                           top_g=top_g) ## HERE
 
             if z_est is not None:
                 # Denoising cost
@@ -289,17 +301,19 @@ class LadderAE():
             logger.info('  g%d: %10s, %s, dim %s -> %s' % (
                 i, l_type,
                 denois_print,
-                self.layer_dims.get(i+1),
-                self.layer_dims.get(i)
+                ver_dim,
+                out_dims
                 ))
 
         # Costs
         y = target_labeled.flatten()
+        y_clean_hat = clean.labeled.h[top].flatten()
+        y_corr_hat = corr.labeled.h[top].flatten()
 
-        costs.class_clean = CategoricalCrossEntropy().apply(y, clean.labeled.h[top])
+        costs.class_clean = CategoricalCrossEntropy().apply(y, y_clean_hat)
         costs.class_clean.name = 'cost_class_clean'
 
-        costs.class_corr = CategoricalCrossEntropy().apply(y, corr.labeled.h[top])
+        costs.class_corr = CategoricalCrossEntropy().apply(y, y_corr_hat)
         costs.class_corr.name = 'cost_class_corr'
 
         # This will be used for training
@@ -512,7 +526,7 @@ class LadderAE():
             if top_g:
                 u = z_ver
             elif is_conv:
-                u = self.g_deconv(z_ver, in_dims, out_dims, gen_id('W'), fspec)
+                u = self.g_deconv(z_ver, in_dims, out_dims, gen_id('W'), fspec) ## HERE
             else:
                 W = self.weight(self.rand_init(in_dim, out_dim), gen_id('W'))
                 u = T.dot(z_ver, W)
@@ -652,6 +666,7 @@ class LadderAE():
             raise NotImplementedError("unknown g type: %s" % str(g_type))
 
         # Reshape the output if z is for conv but u from fc layer
+        ### Reshape correctly the last layer
         if (z_est is not None and type(out_dims) == tuple and
                 len(out_dims) > 1.0 and z_est.ndim < 4):
             z_est = z_est.reshape((z_est.shape[0],) + out_dims)
@@ -672,7 +687,8 @@ class LadderAE():
 
         elif f_type in ['maxpool']:
             sh, str, size = z_ver.shape, f_dims[0], f_dims[1]
-            assert str == size, "depooling requires stride == size"
+            str = size
+            assert str == size, "depooling requires stride == size" ## HERE
             u = T.zeros((sh[0], sh[1], sh[2] * str, sh[3] * str),
                         dtype=z_ver.dtype)
             for x in xrange(str):
