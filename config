@@ -12,11 +12,11 @@ To enable cuDNN
 ----
 Download cuDNN version 5 (for cuda8.0)
 
-Set the following environment variable
+Set the following environment variables
 --------
-export LD_LIBRARY_PATH=/work/ajaynagesh/software/cudnn_51/lib64:$LD_LIBRARY_PATH
-export CPATH=/work/ajaynagesh/software/cudnn_51/include:$CPATH
-export LIBRARY_PATH=/work/ajaynagesh/software/cudnn_51/lib64:$LIBRARY_PATH
+export LD_LIBRARY_PATH=/work/ajaynagesh/software/cudnn_50/lib64:$LD_LIBRARY_PATH
+export CPATH=/work/ajaynagesh/software/cudnn_50/include:$CPATH
+export LIBRARY_PATH=/work/ajaynagesh/software/cudnn_50/lib64:$LIBRARY_PATH
 
 ------------------------
 Adding a conda env to the jupyter notebook environments: need to manually install the environment in the jupyter kernel using ipykernel
