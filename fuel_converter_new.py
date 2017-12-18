@@ -82,10 +82,10 @@ def simple_converter():
     f.flush()
     f.close()
 
-numpy_feature_train_file = "./data/emboot/train_features_emboot.npy"
-numpy_feature_test_file = "./data/emboot/test_features_emboot.npy"
-numpy_target_train_file = "./data/emboot/train_targets_emboot.npy"
-numpy_target_test_file = "./data/emboot/test_targets_emboot.npy"
+numpy_feature_train_file = "./data/emboot_conll/train_features_emboot.npy"
+numpy_feature_test_file = "./data/emboot_conll/test_features_emboot.npy"
+numpy_target_train_file = "./data/emboot_conll/train_targets_emboot.npy"
+numpy_target_test_file = "./data/emboot_conll/test_targets_emboot.npy"
 
 def load_emboot_np():
     train_vector_features = np.load(numpy_feature_train_file)
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     # train_set = H5PYDataset('data/simple_dataset.hdf5', which_sets=('train',))
     # emboot_converter()
 
-    emboot_dataset = "./data/emboot_dataset.traintrain.hdf5"
+    emboot_dataset = "./data/conll.traintrain.hdf5"
     emboot_converter_traintrain(emboot_dataset)
 
     #

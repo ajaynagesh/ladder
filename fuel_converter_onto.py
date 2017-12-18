@@ -47,20 +47,20 @@ def emboot_converter():
     f.flush()
     f.close()
 
-def emboot_converter_traintrain():
+def emboot_converter_traintrain(emboot_dataset):
     train_vector_features, train_targets, test_vector_features, test_targets = load_emboot_np()
     f = h5py.File(emboot_dataset, mode='w')
 
     train_sz = train_vector_features.shape[0]
     test_sz = test_vector_features.shape[0]
     feat_sz = train_vector_features.shape[1]
-    dataset_sz = (train_sz + test_sz - 29) * 2 ## NOTE: 67200 * 2 (copy over the train data to the test dataset)
+    dataset_sz = (train_sz + test_sz) * 2 ## NOTE: 67000 * 2 (copy over the train data to the test dataset)
 
     vector_features = f.create_dataset('features', (dataset_sz, feat_sz), dtype='float64')  ## train + test
     targets = f.create_dataset('targets', (dataset_sz, 1), dtype='uint8')
 
-    train_vector_features_aug = np.vstack([train_vector_features, test_vector_features])[:67200]
-    train_targets_aug = np.vstack([train_targets, test_targets])[:67200]
+    train_vector_features_aug = np.vstack([train_vector_features, test_vector_features])
+    train_targets_aug = np.vstack([train_targets, test_targets])
 
     ## put the data loaded into these objects
     vector_features[...] = np.vstack([train_vector_features_aug, train_vector_features_aug])
@@ -87,7 +87,7 @@ class EMBOOT_ONTO(H5PYDataset):
     u"""EMBOOT dataset
         transformed to Fuel format
     """
-    filename = 'emboot_dataset.onto.traintrain.hdf5'
+    filename = 'onto.traintrain.hdf5'
 
     def __init__(self, which_sets, **kwargs):
         kwargs.setdefault('load_in_memory', True)
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     #
     # train_set = H5PYDataset('data/simple_dataset.hdf5', which_sets=('train',))
     # emboot_converter()
-    emboot_dataset = "./data/emboot_dataset.onto.traintrain.hdf5"
+    emboot_dataset = "./data/onto.traintrain.hdf5"
     emboot_converter_traintrain(emboot_dataset)
 
     # train_set = H5PYDataset(emboot_dataset, which_sets=('train',))
