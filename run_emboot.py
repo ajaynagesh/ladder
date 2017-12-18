@@ -28,7 +28,7 @@ from fuel.schemes import ShuffledScheme, SequentialScheme
 from fuel.streams import DataStream
 from fuel.transformers import Transformer
 
-#from fuel_converter_new import EMBOOT_NEW
+from fuel_converter_new import EMBOOT_CONLL
 from fuel_converter_onto import EMBOOT_ONTO
 
 from picklable_itertools import cycle, imap
@@ -238,8 +238,8 @@ def setup_data(p, test_set=False):
     dataset_class, training_set_size = {
         'cifar10': (CIFAR10, 40000),
         'mnist': (MNIST, 50000),
-        'emboot': (EMBOOT_ONTO, 67000)
-        #'emboot': (EMBOOT_NEW, 13000)
+        'conll': (EMBOOT_ONTO, 67000),
+        'ontonotes': (EMBOOT_CONLL, 13000)
     }[p.dataset]
 
     # Allow overriding the default from command line
@@ -278,7 +278,7 @@ def setup_data(p, test_set=False):
 
     in_dim = train_set.data_sources[train_set.sources.index('features')].shape[1:]
 
-    if p.dataset == 'emboot':
+    if p.dataset == 'conll' or p.dataset == 'ontonotes':
         whiten = None
         cnorm = None
 
@@ -595,8 +595,8 @@ if __name__ == "__main__":
           type=int, default=default(None), nargs='+')
         a("--unlabeled-samples", help="How many unsupervised samples are used",
           type=int, default=default(None), nargs='+')
-        a("--dataset", type=str, default=default(['mnist']), nargs='+',
-          choices=['mnist', 'cifar10', 'emboot'], help="Which dataset to use")
+        a("--dataset", type=str, default=default(['conll']), nargs='+',
+          choices=['mnist', 'cifar10', 'conll', 'ontonotes'], help="Which dataset to use")
         a("--lr", help="Initial learning rate",
           type=float, default=default([0.002]), nargs='+')
         a("--lrate-decay", help="When to linearly start decaying lrate (0-1)",

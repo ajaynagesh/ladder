@@ -87,8 +87,6 @@ numpy_feature_test_file = "./data/emboot/test_features_emboot.npy"
 numpy_target_train_file = "./data/emboot/train_targets_emboot.npy"
 numpy_target_test_file = "./data/emboot/test_targets_emboot.npy"
 
-emboot_dataset = "./data/emboot_dataset.new.hdf5"
-
 def load_emboot_np():
     train_vector_features = np.load(numpy_feature_train_file)
     test_vector_features = np.load(numpy_feature_test_file)
@@ -129,7 +127,7 @@ def emboot_converter():
     f.flush()
     f.close()
 
-class EMBOOT_NEW(H5PYDataset):
+class EMBOOT_CONLL(H5PYDataset):
     u"""EMBOOT dataset
         transformed to Fuel format
     """
@@ -137,7 +135,7 @@ class EMBOOT_NEW(H5PYDataset):
 
     def __init__(self, which_sets, **kwargs):
         kwargs.setdefault('load_in_memory', True)
-        super(EMBOOT_NEW, self).__init__(
+        super(EMBOOT_CONLL, self).__init__(
             file_or_path=find_in_data_path(self.filename),
             which_sets=which_sets, **kwargs)
 
@@ -148,6 +146,7 @@ if __name__ == "__main__":
     #
     # train_set = H5PYDataset('data/simple_dataset.hdf5', which_sets=('train',))
     emboot_converter()
+    emboot_dataset = "./data/emboot_dataset.new.hdf5"
 
     train_set = H5PYDataset(emboot_dataset, which_sets=('train',))
 

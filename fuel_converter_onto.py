@@ -8,8 +8,6 @@ numpy_feature_test_file = "./data/emboot_onto/test_features_emboot.npy"
 numpy_target_train_file = "./data/emboot_onto/train_targets_emboot.npy"
 numpy_target_test_file = "./data/emboot_onto/test_targets_emboot.npy"
 
-emboot_dataset = "./data/emboot_dataset.onto.hdf5"
-
 def load_emboot_np():
     train_vector_features = np.load(numpy_feature_train_file)
     test_vector_features = np.load(numpy_feature_test_file)
@@ -68,6 +66,7 @@ if __name__ == "__main__":
     #
     # train_set = H5PYDataset('data/simple_dataset.hdf5', which_sets=('train',))
     emboot_converter()
+    emboot_dataset = "./data/emboot_dataset.onto.hdf5"
 
     train_set = H5PYDataset(emboot_dataset, which_sets=('train',))
 
