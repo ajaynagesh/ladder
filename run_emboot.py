@@ -242,11 +242,15 @@ def setup_data(p, test_set=False):
         'ontonotes': (EMBOOT_ONTO, 67000)
     }[p.dataset]
 
+    print ("p.dataset = ", p.dataset)
+
     # Allow overriding the default from command line
     if p.get('unlabeled_samples') is not None:
         training_set_size = p.unlabeled_samples
+        print("Training set size : " , training_set_size)
 
     train_set = dataset_class(["train"])
+    print ("train_set.num_examples : " , train_set.num_examples)
 
     # Make sure the MNIST data is in right format
     if p.dataset == 'mnist':
@@ -275,6 +279,7 @@ def setup_data(p, test_set=False):
     if test_set:
         d.test = dataset_class(["test"])
         d.test_ind = numpy.arange(d.test.num_examples)
+        print("d.test.num_examples = ", d.test.num_examples)
 
     in_dim = train_set.data_sources[train_set.sources.index('features')].shape[1:]
 
