@@ -156,8 +156,8 @@ def emboot_converter_traintrain(emboot_dataset):
     ## split attribute -- way to recover the splits
     # creating the split using an API
     split_dict = {
-        'train': {'features': (0, dataset_sz), 'targets': (0, dataset_sz)},
-         'test': {'features': (0, dataset_sz), 'targets': (0, dataset_sz)}}
+        'train': {'features': (0, dataset_sz/2), 'targets': (0, dataset_sz/2)},
+         'test': {'features': (dataset_sz/2, dataset_sz), 'targets': (dataset_sz/2, dataset_sz)}}
     f.attrs['split'] = H5PYDataset.create_split_array(split_dict)
 
     f.flush()
@@ -195,6 +195,7 @@ if __name__ == "__main__":
     # simple_converter()
     #
     # train_set = H5PYDataset('data/simple_dataset.hdf5', which_sets=('train',))
+    # emboot_dataset = "./data/emboot_dataset.new.hdf5"
     # emboot_converter()
 
     emboot_dataset = "./data/conll.traintrain.hdf5"
