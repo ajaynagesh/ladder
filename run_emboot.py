@@ -367,7 +367,7 @@ def analyze(cli_params):
                                     n_labeled=p.labeled_samples,
                                     n_unlabeled=len(data.train_ind),
                                     cnorm=cnorm,
-                                    whiten=whiten, scheme=ShuffledScheme),
+                                    whiten=whiten, scheme=ShuffledScheme, balanced_classes=False),
                     make_datastream(data.valid, data.valid_ind,
                                     p.valid_batch_size,
                                     n_labeled=len(data.valid_ind),
@@ -425,7 +425,8 @@ def analyze(cli_params):
     # Concatenate all minibatches
     res = [numpy.vstack(minibatches) for minibatches in zip(*res)]
     # print("res = " + str(res))
-    # print("res.shape = " + str(res[0].shape))
+    print("res.shape = " + str(res[0].shape))
+    print("input shapes = " + str([(k,len(v)) for k,v in inputs.iteritems()]))
     # print("inputs = " + str(inputs))
     inputs = {k: numpy.vstack(v) for k, v in inputs.iteritems()}
 
