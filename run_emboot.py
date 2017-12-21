@@ -160,7 +160,10 @@ def make_datastream(dataset, indices, batch_size,
             i = (indices[y == c])[:n_from_each_class]
             i_labeled += list(i)
     else:
-        i_labeled = indices[:n_labeled]
+        print("Using fixed set of labeled data points .. from file :=> \"data/seed_ids.training.npy\"")
+        i_labeled = [idx for idx in numpy.load("data/seed_ids.training.npy")]
+        print("size of i_labeled = " , len(i_labeled))
+        # i_labeled = indices[:n_labeled]
 
     # Get unlabeled indices
     i_unlabeled = indices[:n_unlabeled]
@@ -488,7 +491,8 @@ def train(cli_params):
                         n_labeled=p.labeled_samples,
                         n_unlabeled=p.unlabeled_samples,
                         whiten=whiten,
-                        cnorm=cnorm),
+                        cnorm=cnorm,
+                        balanced_classes=False),
         model=Model(ladder.costs.total),
         extensions=[
             FinishAfter(after_n_epochs=p.num_epochs),
