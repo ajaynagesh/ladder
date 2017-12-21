@@ -160,10 +160,10 @@ def make_datastream(dataset, indices, batch_size,
             i = (indices[y == c])[:n_from_each_class]
             i_labeled += list(i)
     else:
-        print("Using fixed set of labeled data points .. from file :=> \"data/seed_ids.training.npy\"")
-        i_labeled = [idx for idx in numpy.load("data/seed_ids.training.npy")]
-        print("size of i_labeled = " , len(i_labeled))
-        # i_labeled = indices[:n_labeled]
+        # print("Using fixed set of labeled data points .. from file :=> \"data/seed_ids.training.npy\"")
+        # i_labeled = [idx for idx in numpy.load("data/seed_ids.training.npy")]
+        # print("size of i_labeled = " , len(i_labeled))
+        i_labeled = indices[:n_labeled]
 
     # Get unlabeled indices
     i_unlabeled = indices[:n_unlabeled]
@@ -367,7 +367,7 @@ def analyze(cli_params):
                                     n_labeled=p.labeled_samples,
                                     n_unlabeled=len(data.train_ind),
                                     cnorm=cnorm,
-                                    whiten=whiten, scheme=ShuffledScheme, balanced_classes=False),
+                                    whiten=whiten, scheme=ShuffledScheme), #, balanced_classes=False),
                     make_datastream(data.valid, data.valid_ind,
                                     p.valid_batch_size,
                                     n_labeled=len(data.valid_ind),
@@ -492,8 +492,8 @@ def train(cli_params):
                         n_labeled=p.labeled_samples,
                         n_unlabeled=p.unlabeled_samples,
                         whiten=whiten,
-                        cnorm=cnorm,
-                        balanced_classes=False),
+                        cnorm=cnorm)#,
+                        #balanced_classes=False),
         model=Model(ladder.costs.total),
         extensions=[
             FinishAfter(after_n_epochs=p.num_epochs),
