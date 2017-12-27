@@ -150,8 +150,8 @@ def make_datastream(dataset, indices, batch_size,
         all_data = dataset.data_sources[dataset.sources.index('targets')]
         y = unify_labels(all_data)[indices]
         n_classes = y.max() + 1
-        logger.info("n_labeled " % n_labeled)
-        logger.info("n_classes " % n_classes)
+        logger.info("n_labeled %d" % n_labeled)
+        logger.info("n_classes %d" % n_classes)
         assert n_labeled % n_classes == 0
         n_from_each_class = n_labeled / n_classes
 
@@ -162,8 +162,7 @@ def make_datastream(dataset, indices, batch_size,
     else:
         logger.info("Using fixed set of labeled data points .. from file :=> \"data/seed_ids.training.npy\"")
         i_labeled = [idx for idx in numpy.load("data/seed_ids.training.npy")]
-        x = str(len(i_labeled))
-        logger.info('size of i_labeled = ' % x)
+        logger.info('size of i_labeled = %d' % len(i_labeled))
         # i_labeled = indices[:n_labeled]
 
     # Get unlabeled indices
