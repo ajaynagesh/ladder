@@ -75,8 +75,8 @@ def emboot_converter_traintrain(emboot_dataset):
     ## split attribute -- way to recover the splits
     # creating the split using an API
     split_dict = {
-        'train': {'features': (0, dataset_sz), 'targets': (0, dataset_sz)},
-         'test': {'features': (0, dataset_sz), 'targets': (0, dataset_sz)}}
+        'train': {'features': (0, dataset_sz/2), 'targets': (0, dataset_sz/2)},
+         'test': {'features': (dataset_sz/2, dataset_sz), 'targets': (dataset_sz/2, dataset_sz)}}
     f.attrs['split'] = H5PYDataset.create_split_array(split_dict)
 
     f.flush()

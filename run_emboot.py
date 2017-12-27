@@ -492,7 +492,7 @@ def train(cli_params):
                         n_labeled=p.labeled_samples,
                         n_unlabeled=p.unlabeled_samples,
                         whiten=whiten,
-                        cnorm=cnorm)#,
+                        cnorm=cnorm),
                         #balanced_classes=False),
         model=Model(ladder.costs.total),
         extensions=[
