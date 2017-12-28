@@ -159,14 +159,16 @@ def make_datastream(dataset, indices, batch_size,
         for c in range(n_classes):
             i = (indices[y == c])[:n_from_each_class]
             i_labeled += list(i)
+
+        # Get unlabeled indices
+        i_unlabeled = indices[:n_unlabeled]
     else:
         logger.info("Using fixed set of labeled data points .. from file :=> \"data/seed_ids.training.npy\"")
         i_labeled = [idx for idx in numpy.load("data/seed_ids.training.npy")]
         logger.info('size of i_labeled = %d' % len(i_labeled))
-        # i_labeled = indices[:n_labeled]
-
-    # Get unlabeled indices
-    i_unlabeled = indices[:n_unlabeled]
+        i_unlabeled = [i for i in indices if i not in i_labeled]
+        logger.info('size of i_unlabeled = %d' % len(i_unlabeled))
+        logger.info('size of total dataset = %d' % (len(i_unlabeled) + len(i_labeled)))
 
     ds = SemiDataStream(
         data_stream_labeled=Whitening(
