@@ -66,8 +66,8 @@ if __name__ == "__main__":
     # emboot_dataset = "./data/emboot_dataset.new.hdf5"
     # emboot_converter()
 
-    numpy_feature_train_file =  "/Users/ajaynagesh/Research/code/research/clint/emboot/data/train_features_emboot_conv.npy" # "./data/data_conll_conv/train_features_emboot_conv.npy"
-    numpy_target_train_file = "/Users/ajaynagesh/Research/code/research/clint/emboot/data/train_targets_emboot_conv.npy" # "./data/data_conll_conv/train_targets_emboot_conv.npy"
+    numpy_feature_train_file = "./data/data_conll_conv/train_features_emboot_conv.npy" #"/Users/ajaynagesh/Research/code/research/clint/emboot/data/train_features_emboot_conv.npy" #
+    numpy_target_train_file = "./data/data_conll_conv/train_targets_emboot_conv.npy" #"/Users/ajaynagesh/Research/code/research/clint/emboot/data/train_targets_emboot_conv.npy" #
     emboot_dataset = "./data/conll.conv.traintrain.hdf5"
     emboot_converter_traintrain(emboot_dataset, numpy_feature_train_file, numpy_target_train_file)
 
