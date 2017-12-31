@@ -161,7 +161,7 @@ def make_datastream(dataset, indices, batch_size,
             i_labeled += list(i)
 
     else:
-        logger.info("Using fixed set of labeled data points .. from file :=> \"data/seed_ids.training.npy\"")
+        logger.info("Using fixed set of labeled data points .. from file :=> \"data/seed_ids.training_new.npy\"")
         i_labeled = [idx for idx in numpy.load("data/seed_ids.training_new.npy")]
         logger.info('size of i_labeled = %d' % len(i_labeled))
 
