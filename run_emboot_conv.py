@@ -42,7 +42,7 @@ from utils import SaveExpParams, SaveLog, SaveParams, AttributeDict
 from nn import ZCA, ContrastNorm
 from nn import ApproxTestMonitoring, FinalTestMonitoring, TestMonitoring
 from nn import LRDecay
-from ladder import LadderAE
+from ladder_emboot_conv import LadderAE
 
 
 class Whitening(Transformer):
