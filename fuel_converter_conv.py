@@ -12,12 +12,16 @@ def emboot_converter_traintrain(emboot_dataset, numpy_feature_train_file, numpy_
     train_vector_features, train_targets = load_emboot_np(numpy_feature_train_file, numpy_target_train_file)
     f = h5py.File(emboot_dataset, mode='w')
 
+    ## Add dummy feature for channel (to be used in convolutional operator)
+    np.expand_dims(train_vector_features, axis=1)
+
     train_sz = train_vector_features.shape[0]
-    ctx_size = train_vector_features.shape[1]
-    embed_sz = train_vector_features.shape[2]
+    channel = train_vector_features.shape[1]
+    ctx_size = train_vector_features.shape[2]
+    embed_sz = train_vector_features.shape[3]
     dataset_sz = (train_sz - 16) * 2 ## NOTE: 13900 * 2 (copy over the train data to the test dataset)
 
-    vector_features = f.create_dataset('features', (dataset_sz, ctx_size, embed_sz), dtype='float64')  ## train + test
+    vector_features = f.create_dataset('features', (dataset_sz, channel, ctx_size, embed_sz), dtype='float64')  ## train + test
     targets = f.create_dataset('targets', (dataset_sz, 1), dtype='uint8')
 
     ## put the data loaded into these objects
@@ -30,8 +34,9 @@ def emboot_converter_traintrain(emboot_dataset, numpy_feature_train_file, numpy_
 
     ## label the dims with names
     vector_features.dims[0].label = 'batch'
-    vector_features.dims[1].label = 'word'
-    vector_features.dims[2].label = 'embed'
+    vector_features.dims[1].label = 'channel'
+    vector_features.dims[2].label = 'word'
+    vector_features.dims[3].label = 'embed'
     targets.dims[0].label = 'batch'
     targets.dims[1].label = 'index'
 
