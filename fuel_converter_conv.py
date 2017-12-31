@@ -13,12 +13,11 @@ def emboot_converter_traintrain(emboot_dataset, numpy_feature_train_file, numpy_
     f = h5py.File(emboot_dataset, mode='w')
 
     train_sz = train_vector_features.shape[0]
-    num_ctxs = train_vector_features.shape[1]
-    ctx_size = train_vector_features.shape[2]
-    embed_sz = train_vector_features.shape[3]
+    ctx_size = train_vector_features.shape[1]
+    embed_sz = train_vector_features.shape[2]
     dataset_sz = (train_sz - 16) * 2 ## NOTE: 13900 * 2 (copy over the train data to the test dataset)
 
-    vector_features = f.create_dataset('features', (dataset_sz, num_ctxs, ctx_size, embed_sz), dtype='float64')  ## train + test
+    vector_features = f.create_dataset('features', (dataset_sz, ctx_size, embed_sz), dtype='float64')  ## train + test
     targets = f.create_dataset('targets', (dataset_sz, 1), dtype='uint8')
 
     ## put the data loaded into these objects
@@ -31,9 +30,8 @@ def emboot_converter_traintrain(emboot_dataset, numpy_feature_train_file, numpy_
 
     ## label the dims with names
     vector_features.dims[0].label = 'batch'
-    vector_features.dims[1].label = 'ent_ctx'
-    vector_features.dims[2].label = 'word'
-    vector_features.dims[3].label = 'embed'
+    vector_features.dims[1].label = 'word'
+    vector_features.dims[2].label = 'embed'
     targets.dims[0].label = 'batch'
     targets.dims[1].label = 'index'
 
@@ -68,11 +66,10 @@ if __name__ == "__main__":
     # emboot_dataset = "./data/emboot_dataset.new.hdf5"
     # emboot_converter()
 
-    numpy_feature_train_file = "./data/data_conll_conv/train_features_emboot_conv.npy"
-    numpy_target_train_file = "./data/data_conll_conv/train_targets_emboot_conv.npy"
+    numpy_feature_train_file =  "/Users/ajaynagesh/Research/code/research/clint/emboot/data/train_features_emboot_conv.npy" # "./data/data_conll_conv/train_features_emboot_conv.npy"
+    numpy_target_train_file = "/Users/ajaynagesh/Research/code/research/clint/emboot/data/train_targets_emboot_conv.npy" # "./data/data_conll_conv/train_targets_emboot_conv.npy"
     emboot_dataset = "./data/conll.conv.traintrain.hdf5"
     emboot_converter_traintrain(emboot_dataset, numpy_feature_train_file, numpy_target_train_file)
 
     #
     # train_set = H5PYDataset(emboot_dataset, which_sets=('train',))
-
