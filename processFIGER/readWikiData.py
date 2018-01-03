@@ -1,6 +1,6 @@
 import json
 import io
-from w2v import Gigaword
+from processFIGER.w2v import Gigaword
 import numpy as np
 import h5py
 from fuel.datasets.hdf5 import H5PYDataset

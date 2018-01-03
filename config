@@ -11,3 +11,11 @@ pip install ipykernel
 python -m ipykernel install --user --name ladder --display-name "Python (ladder)"
 
 (from here https://github.com/jupyter/jupyter/issues/245)
+
+
+To set cuDNN in Blocks
+-----
+
+export CPATH=/work/ajaynagesh/software/cudnn_50/include:
+export LIBRARY_PATH=/work/ajaynagesh/software/cudnn_50/lib64:
+export PATH=/work/ajaynagesh/software/miniconda3/envs/ladder2/bin:/work/ajaynagesh/software/miniconda3/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/usr/local/cuda-8.0/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin:/usr/lib/jvm/java-8-oracle/bin:/usr/lib/jvm/java-8-oracle/db/bin:/usr/lib/jvm/java-8-oracle/jre/bin
