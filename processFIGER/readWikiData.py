@@ -137,6 +137,9 @@ def patternsArndMention(tokens, mention):
 def fuel_converter(fuel_dataset, embeddings_train, labels_train, embeddings_test, labels_test):
     f = h5py.File(fuel_dataset, mode='w')
 
+    labels_train = np.expand_dims(labels_train,axis=1)
+    labels_test = np.expand_dims(labels_test,axis=1)
+
     train_sz = embeddings_train.shape[0] - embeddings_train.shape[0] % 100
     test_sz = embeddings_test.shape[0] - embeddings_test.shape[0] % 100
     feat_sz = embeddings_train.shape[1]
