@@ -30,6 +30,7 @@ from fuel.transformers import Transformer
 
 from fuel_converter_new import EMBOOT_CONLL
 from fuel_converter_onto import EMBOOT_ONTO
+from processFIGER.readWikiData import FIGER
 
 from picklable_itertools import cycle, imap
 from itertools import izip, product, tee
@@ -242,7 +243,8 @@ def setup_data(p, test_set=False):
         'cifar10': (CIFAR10, 40000),
         'mnist': (MNIST, 50000),
         'conll': (EMBOOT_CONLL, 13900),
-        'ontonotes': (EMBOOT_ONTO, 67000)
+        'ontonotes': (EMBOOT_ONTO, 67000),
+        'figer': (FIGER, 641700)
     }[p.dataset]
 
     print ("p.dataset = ", p.dataset)
@@ -286,7 +288,7 @@ def setup_data(p, test_set=False):
 
     in_dim = train_set.data_sources[train_set.sources.index('features')].shape[1:]
 
-    if p.dataset == 'conll' or p.dataset == 'ontonotes':
+    if p.dataset == 'conll' or p.dataset == 'ontonotes' or p.dataset == 'figer':
         whiten = None
         cnorm = None
 
@@ -606,7 +608,7 @@ if __name__ == "__main__":
         a("--unlabeled-samples", help="How many unsupervised samples are used",
           type=int, default=default(None), nargs='+')
         a("--dataset", type=str, default=default(['conll']), nargs='+',
-          choices=['mnist', 'cifar10', 'conll', 'ontonotes'], help="Which dataset to use")
+          choices=['mnist', 'cifar10', 'conll', 'ontonotes', 'figer'], help="Which dataset to use")
         a("--lr", help="Initial learning rate",
           type=float, default=default([0.002]), nargs='+')
         a("--lrate-decay", help="When to linearly start decaying lrate (0-1)",
