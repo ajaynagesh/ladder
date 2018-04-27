@@ -1,6 +1,7 @@
-This repository contains source code for the experiments in a paper titled
-[_Semi-Supervised Learning with Ladder Networks_](http://arxiv.org/abs/1507.02672) by A Rasmus, H Valpola, M Honkala,
-M Berglund, and T Raiko.
+
+This repository contains source code for the experiments in a paper titled "Keep your bearings: Lightly-supervised Information Extraction with Ladder Networks that avoids Semantic Drift
+ by Ajay Nagesh and Mihai Surdeanu (NAACL-HLT 2018)". The origin code is sourced from [_Semi-Supervised Learning with Ladder Networks_](http://arxiv.org/abs/1507.02672) by A Rasmus, H Valpola, M Honkala,
+M Berglund, and T Raiko. 
 
 #### Required libraries
 ##### Install Theano, Blocks Stable 0.2, Fuel Stable 0.2
@@ -98,4 +99,12 @@ After training a model, you can infer the results on a test set by performing th
 An example use after training a model:
 ```
 ./run.py evaluate results/mnist_all_bottom0
+```
+
+##### Named Entity Classification models
+
+- Requires the CoNLL and Ontonotes to be formatted into the Fuel format (instructions coming)
+
+```
+THEANO_FLAGS=device=gpu1 python run_emboot.py train --encoder-layers 500-4 --decoder-spec gauss --denoising-cost-x 1000,10,0.1 --unlabeled-samples 13900 --seed 5 --dataset conll --valid-set-size 0 --labeled-samples 40 -- [expt_name]
 ```
